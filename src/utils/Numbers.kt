@@ -15,3 +15,5 @@ fun Int.isEven(): Boolean = this % 2 == 0
 fun Int.isOdd(): Boolean = this % 2 == 1
 
 fun Int?.orZero(): Int = this ?: 0
+
+fun Long?.orZero(): Long = this ?: 0L
