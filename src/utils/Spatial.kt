@@ -108,7 +108,7 @@ class Cell<T>(val value: T, val coordinate: Coordinate, private val grid: Grid<T
             next(CardinalDirection.NORTH),
             next(CardinalDirection.EAST),
             next(CardinalDirection.SOUTH),
-            next(CardinalDirection.WEST)
+            next(CardinalDirection.WEST),
         )
 
     operator fun plus(direction: CardinalDirection): Cell<T>? =
@@ -139,6 +139,9 @@ interface Grid<T> : Iterable<Cell<T>> {
     val width: Int
 
     val height: Int
+
+    val size: Int
+        get() = width * height
 
     val indices: Sequence<Coordinate>
         get() = sequence {
