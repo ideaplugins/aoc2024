@@ -83,6 +83,25 @@ data class Coordinate(val x: Int, val y: Int) {
         Coordinate(x - other.x, y - other.y)
 }
 
+data class LongCoordinate(val x: Long, val y: Long) {
+
+    fun next(direction: Direction): LongCoordinate =
+        copy(x = x + direction.x, y = y + direction.y)
+
+    fun next(direction: CardinalDirection): LongCoordinate =
+        copy(x = x + direction.x, y = y + direction.y)
+
+    fun distanceTo(other: LongCoordinate): Long = abs(x - other.x) + abs(y - other.y)
+
+    operator fun plus(other: LongCoordinate): LongCoordinate =
+        LongCoordinate(x + other.x, y + other.y)
+
+    operator fun minus(other: LongCoordinate): LongCoordinate =
+        LongCoordinate(x - other.x, y - other.y)
+}
+
+typealias Vector2D = LongCoordinate
+
 data class Coordinate3D(val x: Int, val y: Int, val z: Int) : Comparable<Coordinate3D> {
 
     val xy2DView: Coordinate = Coordinate(x = x, y = y)

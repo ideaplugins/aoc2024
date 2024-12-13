@@ -2,26 +2,26 @@ package year2024
 
 import utils.*
 
-private data class LongCoord(val x: Long, val y: Long)
-
 private data class ClawMachine(
-    val buttonA: LongCoord,
-    val buttonB: LongCoord,
-    val prize: LongCoord,
+    val buttonA: Vector2D,
+    val buttonB: Vector2D,
+    val prize: Vector2D,
 ) {
     fun isValid(timesA: Long, timesB: Long): Boolean =
-        prize.x == buttonA.x * timesA + buttonB.x * timesB && prize.y == buttonA.y * timesA + buttonB.y * timesB
+        timesA >= 0 && timesB >= 0 &&
+                prize.x == buttonA.x * timesA + buttonB.x * timesB &&
+                prize.y == buttonA.y * timesA + buttonB.y * timesB
 }
 
-private fun List<String>.find(prefix: String): LongCoord =
+private fun List<String>.find(prefix: String): Vector2D =
     first { it.startsWith(prefix) }
         .let {
             val components = it.substringAfter(prefix)
                 .split(",")
                 .map { it.trim() }
-            LongCoord(
-                components.first { it.startsWith("X") }.drop(2).toLong(),
-                components.first { it.startsWith("Y") }.drop(2).toLong(),
+            Vector2D(
+                components.first { it.startsWith("X") }.dropWhile { !it.isDigit() }.toLong(),
+                components.first { it.startsWith("Y") }.dropWhile { !it.isDigit() }.toLong(),
             )
         }
 
