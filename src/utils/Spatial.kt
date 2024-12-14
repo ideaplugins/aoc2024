@@ -1,9 +1,6 @@
 package utils
 
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-
 
 enum class MovementDirection {
     RIGHT, LEFT, FRONT;
@@ -81,7 +78,12 @@ data class Coordinate(val x: Int, val y: Int) {
 
     operator fun minus(other: Coordinate): Coordinate =
         Coordinate(x - other.x, y - other.y)
+
+    operator fun times(n: Int): Coordinate =
+        Coordinate(x * n, y * n)
 }
+
+typealias Vector2D = Coordinate
 
 data class LongCoordinate(val x: Long, val y: Long) {
 
@@ -100,7 +102,7 @@ data class LongCoordinate(val x: Long, val y: Long) {
         LongCoordinate(x - other.x, y - other.y)
 }
 
-typealias Vector2D = LongCoordinate
+typealias LongVector2D = LongCoordinate
 
 data class Coordinate3D(val x: Int, val y: Int, val z: Int) : Comparable<Coordinate3D> {
 
@@ -171,10 +173,22 @@ interface Grid<T> : Iterable<Cell<T>> {
             }
         }
 
+    val quadrants: List<Quadrant>
+        get() = listOf(
+            Quadrant(0..<width / 2, 0..<height / 2),
+            Quadrant(0..<width / 2, height / 2 + height % 2..<height),
+            Quadrant(width / 2 + width % 2..<width, 0..<height / 2),
+            Quadrant(width / 2 + width % 2..<width, height / 2 + height % 2..<height),
+        )
+
     operator fun get(coord: Coordinate): Cell<T>?
 
     override fun iterator(): Iterator<Cell<T>> =
-        indices.iterator().asSequence().mapNotNull { this[it] }.iterator()
+        indices.mapNotNull { this[it] }.iterator()
+}
+
+class SparseGrid<T>(val values: Map<Coordinate, T>, override val width: Int, override val height: Int) : Grid<T> {
+    override fun get(coord: Coordinate): Cell<T>? = values[coord]?.let { Cell(it, coord, this) }
 }
 
 class CharGrid(private val grid: List<String>) : Grid<Char> {
@@ -227,7 +241,6 @@ data class RealCoordinate(val x: Double, val y: Double) {
     operator fun plus(other: RealCoordinate): RealCoordinate =
         RealCoordinate(x + other.x, y + other.y)
 
-
     operator fun times(t: Double): RealCoordinate =
         RealCoordinate(x * t, y * t)
 
@@ -252,19 +265,13 @@ data class Line(val m: Double, val b: Double) {
     }
 }
 
-data class Plain2D private constructor(val p0: RealCoordinate, val p1: RealCoordinate) {
+data class Plain2D(val xRange: IntRange, val yRange: IntRange) {
 
-    private val xRange = p0.x..<p1.x
-    private val yRange = p0.y..<p1.y
-
-    operator fun contains(p: RealCoordinate): Boolean =
+    operator fun contains(p: Coordinate): Boolean =
         p.x in xRange && p.y in yRange
-
-    companion object {
-        operator fun invoke(p0: RealCoordinate, p1: RealCoordinate): Plain2D =
-            Plain2D(RealCoordinate(min(p0.x, p1.x), min(p0.y, p1.y)), RealCoordinate(max(p0.x, p1.x), max(p0.y, p1.y)))
-    }
 }
+
+typealias Quadrant = Plain2D
 
 data class PathStep<T>(val cell: Cell<T>, val direction: Direction) {
 

@@ -9,7 +9,7 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
 
 fun String.blankToNull() = trim().ifBlank { null }
 
-private val numRegex = Regex("""(\d+)""")
+private val numRegex = Regex("""(-?\d+)""")
 
 fun String.asInts(): Sequence<Int> =
     numRegex.findAll(this)

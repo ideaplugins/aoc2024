@@ -3,9 +3,9 @@ package year2024
 import utils.*
 
 private data class ClawMachine(
-    val buttonA: Vector2D,
-    val buttonB: Vector2D,
-    val prize: Vector2D,
+    val buttonA: LongVector2D,
+    val buttonB: LongVector2D,
+    val prize: LongVector2D,
 ) {
     fun isValid(timesA: Long, timesB: Long): Boolean =
         timesA >= 0 && timesB >= 0 &&
@@ -13,13 +13,13 @@ private data class ClawMachine(
                 prize.y == buttonA.y * timesA + buttonB.y * timesB
 }
 
-private fun List<String>.find(prefix: String): Vector2D =
+private fun List<String>.find(prefix: String): LongVector2D =
     first { it.startsWith(prefix) }
         .let {
             val components = it.substringAfter(prefix)
                 .split(",")
                 .map { it.trim() }
-            Vector2D(
+            LongVector2D(
                 components.first { it.startsWith("X") }.dropWhile { !it.isDigit() }.toLong(),
                 components.first { it.startsWith("Y") }.dropWhile { !it.isDigit() }.toLong(),
             )
