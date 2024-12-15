@@ -155,7 +155,7 @@ class Cell<T>(val value: T, val coordinate: Coordinate, private val grid: Grid<T
     }
 }
 
-interface Grid<T> : Iterable<Cell<T>> {
+interface Grid<T> : Iterable<Cell<T>>, Plain {
 
     val width: Int
 
@@ -164,10 +164,16 @@ interface Grid<T> : Iterable<Cell<T>> {
     val size: Int
         get() = width * height
 
+    override val xRange: IntRange
+        get() = 0..<width
+
+    override val yRange: IntRange
+        get() = 0..<height
+
     val indices: Sequence<Coordinate>
         get() = sequence {
-            (0..<height).forEach { y ->
-                (0..<width).forEach { x ->
+            yRange.forEach { y ->
+                xRange.forEach { x ->
                     yield(Coordinate(x, y))
                 }
             }
@@ -208,7 +214,7 @@ class CharGrid(private val grid: List<String>) : Grid<Char> {
         CharGrid(
             grid.toMutableList().apply {
                 this[coord.y] = grid[coord.y].replaceRange(coord.x, coord.x + 1, value.toString())
-            }
+            }.toList()
         )
 
     override fun toString(): String = grid.joinToString("\n")
@@ -265,13 +271,16 @@ data class Line(val m: Double, val b: Double) {
     }
 }
 
-data class Plain2D(val xRange: IntRange, val yRange: IntRange) {
-
+interface Plain {
+    val xRange: IntRange
+    val yRange: IntRange
     operator fun contains(p: Coordinate): Boolean =
         p.x in xRange && p.y in yRange
 }
 
-typealias Quadrant = Plain2D
+data class PlainImpl(override val xRange: IntRange, override val yRange: IntRange) : Plain
+
+typealias Quadrant = PlainImpl
 
 data class PathStep<T>(val cell: Cell<T>, val direction: Direction) {
 

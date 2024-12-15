@@ -12,7 +12,7 @@ private fun getUpdates(input: List<String>): List<List<Int>> = input.dropWhile {
     .map { it.asInts().toList() }
 
 private fun isValid(pages: List<Int>, ordering: Map<Int, Set<Int>>): Boolean =
-    (1..<pages.size).all {
+    (1..pages.size).all {
         val (init, last) = pages.take(it).initAndLast
         init.intersect(ordering[last].orEmpty()).isEmpty()
     }
