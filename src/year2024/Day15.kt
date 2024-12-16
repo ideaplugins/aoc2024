@@ -74,7 +74,7 @@ private fun part1(problem: Problem): Int =
         .filter { it.value.isBox() }
         .sumOf { it.coordinate.gps() }
 
-private fun CharGrid.influencedBy(cell: Cell<Char>, direction: Direction): Set<Cell<Char>> {
+private fun influencedBy(cell: Cell<Char>, direction: Direction): Set<Cell<Char>> {
     val queue = ArrayDeque(listOf(cell))
     val influenced = mutableSetOf<Cell<Char>>()
     while (queue.isNotEmpty()) {
@@ -127,7 +127,7 @@ private fun part2(problem: Problem): Int {
                     }
                 }
                 else -> {
-                    val influenced = grid.influencedBy(robot, direction)
+                    val influenced = influencedBy(robot, direction)
                     if (influenced.isNotEmpty() && influenced.all { it.next(direction) in influenced || it.next(direction)?.value?.isFree() == true }) {
                         influenced.fold(grid) { g, c ->
                             g.with(c.coordinate.next(direction), c.value).with(c.coordinate, '.')

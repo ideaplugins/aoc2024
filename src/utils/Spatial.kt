@@ -189,12 +189,17 @@ interface Grid<T> : Iterable<Cell<T>>, Plain {
 
     operator fun get(coord: Coordinate): Cell<T>?
 
+    fun with(coord: Coordinate, value: T): Grid<T>
+
     override fun iterator(): Iterator<Cell<T>> =
         indices.mapNotNull { this[it] }.iterator()
 }
 
 class SparseGrid<T>(val values: Map<Coordinate, T>, override val width: Int, override val height: Int) : Grid<T> {
     override fun get(coord: Coordinate): Cell<T>? = values[coord]?.let { Cell(it, coord, this) }
+
+    override fun with(coord: Coordinate, value: T): Grid<T> =
+        SparseGrid(values + (coord to value), width, height)
 }
 
 class CharGrid(private val grid: List<String>) : Grid<Char> {
@@ -210,11 +215,38 @@ class CharGrid(private val grid: List<String>) : Grid<Char> {
             null
         }
 
-    fun with(coord: Coordinate, value: Char): CharGrid =
+    override fun with(coord: Coordinate, value: Char): CharGrid =
         CharGrid(
             grid.toMutableList().apply {
                 this[coord.y] = grid[coord.y].replaceRange(coord.x, coord.x + 1, value.toString())
             }.toList()
+        )
+
+    override fun toString(): String = grid.joinToString("\n")
+}
+
+class GridByLists<T>(private val grid: List<List<T>>) : Grid<T> {
+
+    override val width: Int = grid[0].size
+
+    override val height: Int = grid.size
+
+    override operator fun get(coord: Coordinate): Cell<T>? =
+        if (coord.y in grid.indices && coord.x in grid[coord.y].indices) {
+            Cell(grid[coord.y][coord.x], coord, this)
+        } else {
+            null
+        }
+
+    override fun with(coord: Coordinate, value: T): Grid<T> =
+        GridByLists(
+            grid.toMutableList()
+                .apply {
+                    this[coord.y] = grid[coord.y].toMutableList()
+                        .apply { this[coord.x] = value }
+                        .toList()
+                }
+                .toList()
         )
 
     override fun toString(): String = grid.joinToString("\n")

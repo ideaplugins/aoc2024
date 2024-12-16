@@ -58,7 +58,7 @@ private fun part2(grid: SparseGrid<List<Robot>>): Int {
             }
         }
     }
-    newGrid.print()
+    // newGrid.print()
     return count
 }
 
