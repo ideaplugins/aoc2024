@@ -109,42 +109,28 @@ private fun part2(problem: Problem): Int {
             when {
                 next == null || next.value.isWall() -> grid
                 next.value.isFree() -> grid.with(next.coordinate, '@').with(robot.coordinate, '.')
-                else -> {
+                direction.isHorizontal -> {
                     val boxes = generateSequence(next) { it.next(direction) }
                         .takeWhile { it.value.isBox() }
-                        .toList()
-                    val firstAfterBoxes = boxes.last().next(direction)
+                    val nextAfterBoxes = boxes.last().next(direction)
                     when {
-                        firstAfterBoxes == null -> grid
-                        firstAfterBoxes.value.isWall() -> grid
-                        firstAfterBoxes.value.isFree() -> {
-                            if (direction.isHorizontal) {
-                                boxes.reversed().fold(grid) { g, c ->
-                                    g.with(c.coordinate.next(direction), c.value)
-                                }.with(boxes.first().coordinate, '@').with(robot.coordinate, '.')
-                            } else {
-                                var newGrid = grid
-                                var newRobot = robot
-                                var influenced = influencedBy(newRobot, direction)
-                                if (influenced.isNotEmpty() && influenced.all {
-                                        it.next(direction) in influenced || it.next(
-                                            direction
-                                        )?.value?.isFree() == true
-                                    }) {
-
-                                    val sortedInfluenced = influenced.sortedBy { it.coordinate.y }
-                                        .let { if (direction == Direction.UP) it else it.reversed() }
-                                    newGrid = sortedInfluenced.fold(newGrid) { g, c ->
-                                        g.with(c.coordinate.next(direction), c.value).with(c.coordinate, '.')
-                                    }.with(newRobot.coordinate, '.').with(newRobot.coordinate.next(direction), '@')
-                                    newRobot = newRobot.next(direction)!!
-                                    influenced = influencedBy(newRobot, direction)
-                                }
-                                newGrid
-                            }
+                        nextAfterBoxes?.value?.isFree() == true -> {
+                            boxes.fold(grid) { g, c ->
+                                g.with(c.coordinate.next(direction), c.value)
+                            }.with(next.coordinate, '@').with(robot.coordinate, '.')
                         }
-
-                        else -> error("Invalid state: $firstAfterBoxes")
+                        else -> grid
+                    }
+                }
+                else -> {
+                    val influenced = influencedBy(robot, direction)
+                    if (influenced.isNotEmpty() && influenced.all { it.next(direction) in influenced || it.next(direction)?.value?.isFree() == true }) {
+                        influenced.sortedBy { if (direction == Direction.UP) it.coordinate.y else -it.coordinate.y }
+                            .fold(grid) { g, c -> g.with(c.coordinate.next(direction), c.value).with(c.coordinate, '.') }
+                            .with(robot.coordinate, '.')
+                            .with(robot.coordinate.next(direction), '@')
+                    } else {
+                        grid
                     }
                 }
             }
@@ -152,7 +138,6 @@ private fun part2(problem: Problem): Int {
         .filter { it.value == '[' }
         .sumOf { it.coordinate.gps() }
 }
-
 
 fun main() {
     assertEquals(10092, part1(parse(true)))
