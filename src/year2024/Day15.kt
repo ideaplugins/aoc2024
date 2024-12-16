@@ -2,7 +2,7 @@ package year2024
 
 import utils.*
 
-private data class Problem(val grid: CharGrid, val instructions: List<Direction>)
+private data class Problem(val grid: Grid<Char>, val instructions: List<Direction>)
 
 private fun Char.isRobot(): Boolean = this == '@'
 

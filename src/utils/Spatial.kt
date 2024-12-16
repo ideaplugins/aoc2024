@@ -215,7 +215,7 @@ class CharGrid(private val grid: List<String>) : Grid<Char> {
             null
         }
 
-    override fun with(coord: Coordinate, value: Char): CharGrid =
+    override fun with(coord: Coordinate, value: Char): Grid<Char> =
         CharGrid(
             grid.toMutableList().apply {
                 this[coord.y] = grid[coord.y].replaceRange(coord.x, coord.x + 1, value.toString())
