@@ -13,12 +13,10 @@ private data class ClawMachine(
                 prize.y == buttonA.y * timesA + buttonB.y * timesB
 }
 
-private fun List<String>.find(prefix: String): LongVector2D =
-    first { it.startsWith(prefix) }
+private fun List<String>.findVector(prefix: String): LongVector2D =
+    find(prefix)
         .let {
-            val components = it.substringAfter(prefix)
-                .split(",")
-                .map { it.trim() }
+            val components = it.split(",").map { it.trim() }
             LongVector2D(
                 components.first { it.startsWith("X") }.dropWhile { !it.isDigit() }.toLong(),
                 components.first { it.startsWith("Y") }.dropWhile { !it.isDigit() }.toLong(),
@@ -30,9 +28,9 @@ private fun parse(test: Boolean = false): List<ClawMachine> =
         .chunked(4)
         .map {
             ClawMachine(
-                buttonA = it.find("Button A: "),
-                buttonB = it.find("Button B: "),
-                prize = it.find("Prize: "),
+                buttonA = it.findVector("Button A: "),
+                buttonB = it.findVector("Button B: "),
+                prize = it.findVector("Prize: "),
             )
         }
 

@@ -18,3 +18,6 @@ fun String.asInts(): Sequence<Int> =
 fun String.asLongs(): Sequence<Long> =
     numRegex.findAll(this)
         .map { it.groupValues[1].toLong() }
+
+fun List<String>.find(prefix: String): String =
+    first { it.startsWith(prefix) }.substringAfter(prefix).trim()
