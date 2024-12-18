@@ -187,7 +187,18 @@ interface Grid<T> : Iterable<Cell<T>>, Plain {
             Quadrant(width / 2 + width % 2..<width, height / 2 + height % 2..<height),
         )
 
+    fun firstOrNull(): Cell<T>? = this[Coordinate(0, 0)]
+
+    fun first(): Cell<T> = checkNotNull(firstOrNull())
+
+    fun lastOrNull(): Cell<T>? = this[Coordinate(width - 1, height - 1)]
+
+    fun last(): Cell<T> = checkNotNull(lastOrNull())
+
     operator fun get(coord: Coordinate): Cell<T>?
+
+    fun getOrDefault(coord: Coordinate, defaultValue: T): Cell<T> =
+        this[coord] ?: Cell(defaultValue, coord, this)
 
     fun with(coord: Coordinate, value: T): Grid<T>
 
