@@ -13,7 +13,7 @@ private enum class OpCode {
     CDV,
 }
 
-class Computer(
+private class Computer(
     var regA: Long,
     var regB: Long,
     var regC: Long,
@@ -60,7 +60,7 @@ private fun parse(test: Boolean = false): Computer =
         )
     }
 
-private fun part1(computer: Computer): String = computer.run().joinToString(",")
+private fun part1(computer: Computer): List<Int> = computer.run()
 
 private fun calculateB(a: Long): Long {
     val b = (a % 8).xor(5)
@@ -89,15 +89,14 @@ private fun part2b(computer: Computer): Long =
     computer.instructions
         .reversed()
         .asSequence()
-        .runningFold(listOf(0L)) { acc, n ->
+        .fold(listOf(0L)) { acc, n ->
             acc.flatMap { calculateA(n, it) }
         }
-        .last()
         .first()
 
 fun main() {
-    assertEquals("4,6,3,5,6,3,5,2,1,0", part1(parse(true)))
-    assertEquals("2,7,6,5,6,0,2,3,1", part1(parse()))
+    assertEquals(listOf(4, 6, 3, 5, 6, 3, 5, 2, 1, 0), part1(parse(true)))
+    assertEquals(listOf(2, 7, 6, 5, 6, 0, 2, 3, 1), part1(parse()))
     assertEquals(117440, part2a(Computer(2024, 0, 0, listOf(0, 3, 5, 4, 3, 0))))
     assertEquals(107416870455451, part2b(parse()))
 }
