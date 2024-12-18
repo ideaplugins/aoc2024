@@ -206,11 +206,35 @@ interface Grid<T> : Iterable<Cell<T>>, Plain {
         indices.mapNotNull { this[it] }.iterator()
 }
 
+interface MutableGrid<T> : Grid<T> {
+    operator fun set(coord: Coordinate, value: T)
+
+    fun clear()
+}
+
 class SparseGrid<T>(val values: Map<Coordinate, T>, override val width: Int, override val height: Int) : Grid<T> {
     override fun get(coord: Coordinate): Cell<T>? = values[coord]?.let { Cell(it, coord, this) }
 
     override fun with(coord: Coordinate, value: T): Grid<T> =
         SparseGrid(values + (coord to value), width, height)
+}
+
+class MutableSparseGrid<T>(values: Map<Coordinate, T>, override val width: Int, override val height: Int) : MutableGrid<T> {
+
+    private val values = values.toMutableMap()
+
+    override fun get(coord: Coordinate): Cell<T>? = values[coord]?.let { Cell(it, coord, this) }
+
+    override fun with(coord: Coordinate, value: T): Grid<T> =
+        apply { set(coord, value) }
+
+    override fun set(coord: Coordinate, value: T) {
+        values[coord] = value
+    }
+
+    override fun clear() {
+        values.clear()
+    }
 }
 
 class CharGrid(private val grid: List<String>) : Grid<Char> {

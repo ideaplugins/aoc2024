@@ -5,12 +5,12 @@ import java.util.*
 class Maze<T>(private val grid: Grid<T>, private val wallPredicate: (Cell<T>) -> Boolean) {
 
     fun findShortestDistance(start: Coordinate, end: Coordinate): Int? {
-        var distances: Grid<Int> = GridByLists(List(grid.height) { List(grid.width) { Int.MAX_VALUE } })
+        val distances: MutableGrid<Int> = MutableSparseGrid(emptyMap(), grid.width, grid.height)
         val queue = LinkedList<Pair<Coordinate, Int>>().apply { offer(start to 0) }
         while (queue.isNotEmpty()) {
             val (coord, weight) = queue.poll()
             if (weight < distances.getOrDefault(coord, Int.MAX_VALUE).value) {
-                distances = distances.with(coord, weight)
+                distances[coord] = weight
                 grid[coord]?.nesw()
                     .orEmpty()
                     .filter { !wallPredicate(it) }
