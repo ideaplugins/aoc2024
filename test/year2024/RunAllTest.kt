@@ -8,7 +8,10 @@ class RunAllTest {
         (1..25).forEach { day ->
             println("Testing day $day...")
             runCatching { test(day, 2024) }
-                .onFailure { ex -> println("Failed on day $day: ${ex.message}.") }
+                .onFailure { ex ->
+                    println("Failed on day $day: ${ex.message}.")
+                    ex.printStackTrace()
+                }
         }
     }
 
