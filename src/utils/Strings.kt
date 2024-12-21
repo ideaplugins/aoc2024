@@ -21,3 +21,21 @@ fun String.asLongs(): Sequence<Long> =
 
 fun List<String>.find(prefix: String): String =
     first { it.startsWith(prefix) }.substringAfter(prefix).trim()
+
+fun CharSequence.countWhile(predicate: (Char) -> Boolean): Int {
+    var count = 0
+    var i = 0
+    while (i < length && predicate(this[i++])) {
+        count++
+    }
+    return count
+}
+
+fun CharSequence.countLastWhile(predicate: (Char) -> Boolean): Int {
+    var count = 0
+    var i = length
+    while (i > 0 && predicate(this[--i])) {
+        count++
+    }
+    return count
+}

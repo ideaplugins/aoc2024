@@ -46,3 +46,21 @@ val <T> Sequence<T>.init: Sequence<T>
 
 val <T> Sequence<T>.initAndLast: Pair<Sequence<T>, T>
     get() = init to last
+
+fun <T> List<T>.countWhile(predicate: (T) -> Boolean): Int {
+    var count = 0
+    var i = 0
+    while (i < size && predicate(this[i++])) {
+        count++
+    }
+    return count
+}
+
+fun <T> List<T>.countLastWhile(predicate: (T) -> Boolean): Int {
+    var count = 0
+    var i = size
+    while (i > 0 && predicate(this[--i])) {
+        count++
+    }
+    return count
+}

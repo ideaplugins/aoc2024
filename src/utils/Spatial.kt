@@ -170,15 +170,6 @@ interface Grid<T> : Iterable<Cell<T>>, Plain {
     override val yRange: IntRange
         get() = 0..<height
 
-    val indices: Sequence<Coordinate>
-        get() = sequence {
-            yRange.forEach { y ->
-                xRange.forEach { x ->
-                    yield(Coordinate(x, y))
-                }
-            }
-        }
-
     val quadrants: List<Quadrant>
         get() = listOf(
             Quadrant(0..<width / 2, 0..<height / 2),
@@ -204,12 +195,16 @@ interface Grid<T> : Iterable<Cell<T>>, Plain {
 
     override fun iterator(): Iterator<Cell<T>> =
         indices.mapNotNull { this[it] }.iterator()
+
+    fun toMutableGrid(): MutableGrid<T>
 }
 
 interface MutableGrid<T> : Grid<T> {
     operator fun set(coord: Coordinate, value: T)
 
     fun clear()
+
+    fun toGrid(): Grid<T>
 }
 
 class SparseGrid<T>(val values: Map<Coordinate, T>, override val width: Int, override val height: Int) : Grid<T> {
@@ -217,6 +212,8 @@ class SparseGrid<T>(val values: Map<Coordinate, T>, override val width: Int, ove
 
     override fun with(coord: Coordinate, value: T): Grid<T> =
         SparseGrid(values + (coord to value), width, height)
+
+    override fun toMutableGrid(): MutableGrid<T> = MutableSparseGrid(values, width, height)
 }
 
 class MutableSparseGrid<T>(values: Map<Coordinate, T>, override val width: Int, override val height: Int) : MutableGrid<T> {
@@ -228,6 +225,8 @@ class MutableSparseGrid<T>(values: Map<Coordinate, T>, override val width: Int, 
     override fun with(coord: Coordinate, value: T): Grid<T> =
         apply { set(coord, value) }
 
+    override fun toMutableGrid(): MutableGrid<T> = this
+
     override fun set(coord: Coordinate, value: T) {
         values[coord] = value
     }
@@ -235,6 +234,9 @@ class MutableSparseGrid<T>(values: Map<Coordinate, T>, override val width: Int, 
     override fun clear() {
         values.clear()
     }
+
+    override fun toGrid(): Grid<T> =
+        SparseGrid(values.toMap(), width, height)
 }
 
 class CharGrid(private val grid: List<String>) : Grid<Char> {
@@ -256,6 +258,10 @@ class CharGrid(private val grid: List<String>) : Grid<Char> {
                 this[coord.y] = grid[coord.y].replaceRange(coord.x, coord.x + 1, value.toString())
             }.toList()
         )
+
+    override fun toMutableGrid(): MutableGrid<Char> {
+        TODO("Not yet implemented")
+    }
 
     override fun toString(): String = grid.joinToString("\n")
 }
@@ -283,6 +289,10 @@ class GridByLists<T>(private val grid: List<List<T>>) : Grid<T> {
                 }
                 .toList()
         )
+
+    override fun toMutableGrid(): MutableGrid<T> {
+        TODO("Not yet implemented")
+    }
 
     override fun toString(): String = grid.joinToString("\n")
 }
@@ -341,6 +351,16 @@ data class Line(val m: Double, val b: Double) {
 interface Plain {
     val xRange: IntRange
     val yRange: IntRange
+
+    val indices: Sequence<Coordinate>
+        get() = sequence {
+            yRange.forEach { y ->
+                xRange.forEach { x ->
+                    yield(Coordinate(x, y))
+                }
+            }
+        }
+
     operator fun contains(p: Coordinate): Boolean =
         p.x in xRange && p.y in yRange
 }
@@ -357,3 +377,8 @@ data class PathStep<T>(val cell: Cell<T>, val direction: Direction) {
 
     fun next(newDir: Direction): PathStep<T>? = cell.next(newDir)?.let { PathStep(it, newDir) }
 }
+
+typealias Path = List<Coordinate>
+
+inline fun <T> buildGrid(width: Int, height: Int, builderAction: MutableGrid<T>.() -> Unit): Grid<T> =
+    MutableSparseGrid<T>(emptyMap(), width, height).apply(builderAction).toGrid()

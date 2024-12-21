@@ -20,7 +20,7 @@ private fun part1(input: List<String>, size: Int, count: Int): Int? {
         .map { (x, y) -> Coordinate(x, y) }
         .toSet()
     val grid = buildGrid(size, corruptedCoordinates)
-    val maze = Maze(grid) { it.value == '#'}
+    val maze = Maze(grid) { value == '#'}
     return maze.findShortestDistance(grid.first().coordinate, grid.last().coordinate)
 }
 
@@ -29,7 +29,7 @@ private fun part2(input: List<String>, size: Int, min: Int): Coordinate {
         .map { (x, y) -> Coordinate(x, y) }
     (min + 1..corruptedCoordinates.size).forEach {
         val grid = buildGrid(size, corruptedCoordinates.take(it).toSet())
-        val maze = Maze(grid) { it.value == '#' }
+        val maze = Maze(grid) { value == '#' }
         if (!maze.existsPath(grid.first().coordinate, grid.last().coordinate)) {
             return corruptedCoordinates[it - 1]
         }
